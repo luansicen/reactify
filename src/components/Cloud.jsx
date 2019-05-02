@@ -22,7 +22,6 @@ class Cloud extends React.Component {
   }
 
   componentDidUpdate(prevProps){
-    console.log(prevProps, this.props.songs);
     if (this.props.songs !== prevProps.songs) {
       this.addToCloud(this.props.songs);
     }
@@ -39,15 +38,15 @@ class Cloud extends React.Component {
           PROXY_URL1 +
             `https://api.musixmatch.com/ws/1.1/matcher.lyrics.get?q_track=${song.name}&q_artist=${artist}&apikey=${LYRICS_API_KEY}`
         );
-        if(res[0] === undefined) {
-          alert("The lyrics for this song weren't found!");
-          break;
-        }
+        
         let resText = await res.json();
         let lyrics = resText.message.body.lyrics.lyrics_body;
 
         lyrics = lyrics.replace(/(\r\n|\n|\r)/gm, " ");
-        lyrics = lyrics.replace(/,/g, "");
+        lyrics = lyrics.replace(/[-]/g," ");
+        lyrics = lyrics.replace(/[(),]/g,"");
+        lyrics = lyrics.replace(/\s+/g,' ').trim();
+
         lyrics = lyrics.substring(0, lyrics.indexOf(" ...")); // lyrics get cut off after 30% :(
 
         newLyrics[song.id] = lyrics;
@@ -65,7 +64,6 @@ class Cloud extends React.Component {
       let lyrics = this.state.allLyrics[id];
       lyrics = lyrics.toLowerCase().split(" ");
       lyrics = sw.removeStopwords(lyrics);
-      console.log(lyrics);
 
       lyrics.forEach(word => {
         var found = false;
@@ -80,10 +78,8 @@ class Cloud extends React.Component {
           newData = newData.concat([{text:word, value: 1}])
         }
       })
-      this.setState({data: newData})
-    })
-
-    console.log(this.state.data);
+    });
+    this.setState({data: newData});
   }
 
   addToCloud(songs) {
