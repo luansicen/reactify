@@ -4,7 +4,6 @@ import Spotify from "spotify-web-api-js";
 import Song from "./components/Song";
 import Playlist from "./components/Playlist";
 import Cloud from "./components/Cloud";
-import SearchBar from "./components/SearchBar";
 
 class App extends React.Component {
   constructor(props) {
@@ -21,13 +20,11 @@ class App extends React.Component {
     this.playlist = React.createRef();
     this.onSubmit = this.onSubmit.bind(this);
   }
-  updateSearch(name) {
-    this.setState({ search: name});
-  }
+
   handleAddToPlaylist(song) {
     this.playlist.current.addSong(song)
     this.setState(prevState => ({playlist_songs: prevState.playlist_songs.concat(song)}));
-  };
+  }
 
   async componentDidMount() {
     if (window.location.hash) {
@@ -92,8 +89,27 @@ class App extends React.Component {
     }
     return (
       <div className="ui container">
-
-        <SearchBar search = {() => this.updateSearch} onSubmit = {this.onSubmit}/>
+        <nav class="navbar navbar-light bg-light justify-content-between">
+          <a class="navbar-brand">
+            <h2>Reactify</h2>
+          </a>
+          <form
+            className="form-inline"
+            onSubmit={this.onSubmit}
+            aria-label="Search"
+          >
+            <input
+              class="form-control mr-sm-1"
+              type="text"
+              placeholder="Search"
+              aria-label="Search"
+              onChange={e => this.setState({ search: e.target.value })}
+            />
+            <button class="btn btn-outline-primary" type="submit">
+              Find Song
+            </button>
+          </form>
+        </nav>
         <div class="ui divided items">
           {this.state.songs.map(song => (
             <Song
