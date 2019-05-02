@@ -19,7 +19,7 @@ class Cloud extends React.Component {
       rotate: word => 0
     }
   }
-
+  
   componentDidUpdate(prevProps){
     if (this.props.songs !== prevProps.songs) {
       this.addToCloud(this.props.songs);
@@ -37,6 +37,7 @@ class Cloud extends React.Component {
             `https://api.musixmatch.com/ws/1.1/track.lyrics.get?track_id=15953433&apikey=${LYRICS_API_KEY}`
         );
         let resText = await res.json();
+        console.log(resText);
         let lyrics = resText.message.body.lyrics.lyrics_body;
 
         lyrics = lyrics.replace(/(\r\n|\n|\r)/gm, " ");
