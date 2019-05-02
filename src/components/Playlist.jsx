@@ -1,12 +1,9 @@
 import React from "react";
-import Song from "./Song";
-
-
+import AddedSong from "./AddedSong";
 
 class Playlist extends React.Component {
   constructor(props) {
     super(props);
-    // this.addToPlaylist = this.addToPlaylist.bind(this);
     this.state = {
       songs: props.songs
     };
@@ -14,21 +11,23 @@ class Playlist extends React.Component {
   addSong(song) {
     this.setState(prevState => ({ songs: [...this.state.songs, song] }));
   }
-  // addToPlaylist() {
-  //   this.fetchLyrics();
-  // }
 
+  deleteSong(song) {
+    this.setState(prevState => ({
+      songs: prevState.songs.filter(currSong => currSong.id != song.id)
+    }));
+  }
+  
   render() {
     return (
       <div>
         <div class="ui divided items">
           {this.state.songs.map(song => (
-            <Song
+            <AddedSong
               url={song.album.images[0].url}
               name={song.name}
               artists={song.artists.map(artist => artist.name).join(", ")}
-              onAddToPlaylist={this.addToPlaylist}
-              button={false}
+              onDeleteFromPlaylist={() => this.deleteSong(song)}
               key={song.id}
             />
           ))}

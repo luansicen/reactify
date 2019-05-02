@@ -11,7 +11,8 @@ class Cloud extends React.Component {
   constructor(props) {
     super(props);
     this.fetchLyrics = this.fetchLyrics.bind(this);
-    this.addToCloud = this.addToCloud.bind(this)
+    this.addToCloud = this.addToCloud.bind(this);
+    this.updateData = this.updateData.bind(this);
     this.state = {
       allLyrics: {}, // for all songs in playlist, maps spotify song.id to string of lyrics
       data: [],
@@ -19,8 +20,9 @@ class Cloud extends React.Component {
       rotate: word => 0
     }
   }
-  
+
   componentDidUpdate(prevProps){
+    console.log(prevProps, this.props.songs);
     if (this.props.songs !== prevProps.songs) {
       this.addToCloud(this.props.songs);
     }
@@ -32,12 +34,16 @@ class Cloud extends React.Component {
       if (song.id in this.state.allLyrics) {
         newLyrics[song.id] = this.state.allLyrics[song.id];
       } else {
+        let artist = song.artists[0].name
         let res = await fetch(
           PROXY_URL1 +
-            `https://api.musixmatch.com/ws/1.1/track.lyrics.get?track_id=15953433&apikey=${LYRICS_API_KEY}`
+            `https://api.musixmatch.com/ws/1.1/matcher.lyrics.get?q_track=${song.name}&q_artist=${artist}&apikey=${LYRICS_API_KEY}`
         );
+        if(res[0] === undefined) {
+          alert("The lyrics for this song weren't found!");
+          break;
+        }
         let resText = await res.json();
-        console.log(resText);
         let lyrics = resText.message.body.lyrics.lyrics_body;
 
         lyrics = lyrics.replace(/(\r\n|\n|\r)/gm, " ");
@@ -49,17 +55,15 @@ class Cloud extends React.Component {
 
     };
 
-    this.setState({allLyrics: newLyrics});
+    this.setState({allLyrics: newLyrics}, this.updateData);
   }
 
-  addToCloud(songs) {
-    this.fetchLyrics(songs);
-
+  updateData() {
     let newData = [];
 
     Object.keys(this.state.allLyrics).forEach((id) => {
       let lyrics = this.state.allLyrics[id];
-      lyrics = lyrics.split(" ");
+      lyrics = lyrics.toLowerCase().split(" ");
       lyrics = sw.removeStopwords(lyrics);
       console.log(lyrics);
 
@@ -80,6 +84,10 @@ class Cloud extends React.Component {
     })
 
     console.log(this.state.data);
+  }
+
+  addToCloud(songs) {
+    this.fetchLyrics(songs);
   }
 
   render() {
