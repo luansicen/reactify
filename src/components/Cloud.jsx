@@ -16,7 +16,8 @@ class Cloud extends React.Component {
     this.state = {
       allLyrics: {}, // for all songs in playlist, maps spotify song.id to string of lyrics
       data: [],
-      fontSizeMapper: word => Math.log2(word.value*200) * 5,
+      //fontSizeMapper: word => Math.log2(word.value*200) * 5,
+      fontSizeMapper: word => (1 + word.value) * 10,
       rotate: word => 0
     }
   }
@@ -36,9 +37,9 @@ class Cloud extends React.Component {
         let artist = song.artists[0].name
         let res = await fetch(
           PROXY_URL1 +
-            `https://api.musixmatch.com/ws/1.1/matcher.lyrics.get?q_track=${song.name}&q_artist=${artist}&apikey=${LYRICS_API_KEY}`
+            `https://api.musixmatch.com/ws/1.1/matcher.lyrics.get?q_track=${song.name}&q_artist=${artist}&apikey=1c1c6a99ca4fc38d212eba1de3c22328`
         );
-        
+
         let resText = await res.json();
         let lyrics = resText.message.body.lyrics.lyrics_body;
 
